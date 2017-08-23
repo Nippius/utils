@@ -9,44 +9,41 @@ namespace libtruncate
 {
     public class Truncate
     {
-        public static void TruncateFiles(bool noCreate, bool quiet, long size, List<string> files)
+        public static void TruncateFiles(FileMode fileMode, bool quiet, long size, List<string> files)
         {
-            FileMode fileMode = FileMode.OpenOrCreate;
-            if (noCreate)
-                fileMode = FileMode.Open;
-
             foreach (string f in files)
             {
                 string fullPath = Path.GetFullPath(f);
-                try
-                {
-                    using (FileStream fs = new FileStream(fullPath, fileMode))
-                    {
-                        fs.SetLength(size);
-                        fs.Seek(fs.Length, SeekOrigin.Begin);
-                    }
-                }
-                catch (FileNotFoundException)
-                {
-                    if (!quiet)
-                        Console.WriteLine($"File not found: {Path.GetFullPath(f)}");
-                }
+                TruncateFile(fileMode, size, quiet, fullPath);
             }
         }
 
-        public static void TruncateFilesAsync(bool noCreate, bool quiet, long size, List<string> files)
+        public static void ParallelTruncateFiles(FileMode fileMode, bool quiet, long size, List<string> files)
         {
-
+            Parallel.ForEach(files, (file) =>
+            {
+                string fullPath = Path.GetFullPath(file);
+                TruncateFile(fileMode, size, quiet, fullPath);
+            });
         }
 
-        public static void ParalelleTruncateFiles(bool noCreate, bool quiet, long size, List<string> files)
+        private static void TruncateFile(FileMode fileMode, long size, bool quiet, string fileFullPath)
         {
-
-        }
-
-        public static void ParalelleTruncateFilesAsync(bool noCreate, bool quiet, long size, List<string> files)
-        {
-
+            try
+            {
+                using (FileStream fs = new FileStream(fileFullPath, fileMode))
+                {
+                    fs.SetLength(size);
+                    // Make sure that the changes take effect when the stream is
+                    // flushed to disk.
+                    fs.Seek(fs.Length, SeekOrigin.Begin);
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                if (!quiet)
+                    Console.WriteLine($"File not found: {fileFullPath}");
+            }
         }
     }
 }

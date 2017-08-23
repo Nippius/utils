@@ -35,14 +35,15 @@ namespace truncate
             public List<string> FileNames { get; set; }
         }
 
-        
-
         static void Main(string[] args)
         {
             try
             {
                 Options opt = CliParser.Parse<Options>(args);
-                Truncate.TruncateFiles(opt.NoCreate, opt.Quiet, opt.Size, opt.FileNames);
+
+                FileMode fileMode = (opt.NoCreate) ? FileMode.Open : FileMode.OpenOrCreate;
+
+                Truncate.TruncateFiles(fileMode, opt.Quiet, opt.Size, opt.FileNames);
             }
             catch (ParseException ex)
             {
