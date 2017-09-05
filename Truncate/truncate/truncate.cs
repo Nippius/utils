@@ -1,5 +1,6 @@
 ﻿using clipr;
 using clipr.Core;
+using LibTruncate;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,7 +39,12 @@ namespace Truncate
 
                 FileMode fileMode = (opt.NoCreate) ? FileMode.Open : FileMode.OpenOrCreate;
 
-                LibTruncate.Truncate.TruncateFiles(fileMode, opt.Quiet, opt.Size, opt.FileNames);
+                LibTruncate.Truncate.TruncateFiles(new TruncateOptions
+                {
+                    FileMode = fileMode,
+                    Quiet = opt.Quiet,
+                    Size = opt.Size
+                }, opt.FileNames);
             }
             catch (ParseException ex)
             {

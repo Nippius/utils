@@ -32,7 +32,7 @@ namespace TruncateTests
 
             try
             {
-                Truncate.TruncateFiles(FileMode.OpenOrCreate, false, negativeSize, files);
+                Truncate.TruncateFiles(new TruncateOptions { Size = negativeSize }, files);
             }
             finally
             {

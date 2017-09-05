@@ -5,33 +5,48 @@ using System.Threading.Tasks;
 
 namespace LibTruncate
 {
+    /// <summary>
+    /// Available options for truncating files.
+    /// </summary>
+    public class TruncateOptions
+    {
+        public FileMode FileMode { get; set; } = FileMode.OpenOrCreate;
+        public bool Quiet { get; set; }
+        public long Size { get; set; }
+    }
+
+    /// <summary>
+    /// Contains static methods for truncating a list of files.
+    /// </summary>
     public class Truncate
     {
-        public static void TruncateFiles(FileMode fileMode, bool quiet, long size, List<string> files)
+        public static void TruncateFiles(TruncateOptions opt, List<string> files)
         {
             foreach (string f in files)
             {
                 string fullPath = Path.GetFullPath(f);
-                TruncateFile(fileMode, size, quiet, fullPath);
+                TruncateFile(opt, fullPath);
             }
         }
 
-        public static void ParallelTruncateFiles(FileMode fileMode, bool quiet, long size, List<string> files)
+        public static void ParallelTruncateFiles(TruncateOptions opt, List<string> files)
         {
             Parallel.ForEach(files, (file) =>
             {
                 string fullPath = Path.GetFullPath(file);
-                TruncateFile(fileMode, size, quiet, fullPath);
+                TruncateFile(opt, fullPath);
             });
         }
 
-        private static void TruncateFile(FileMode fileMode, long size, bool quiet, string fileFullPath)
+        private static void TruncateFile(TruncateOptions opt, string fileFullPath)
         {
+            if (opt == null)
+                throw new ArgumentNullException(nameof(opt));
             try
             {
-                using (FileStream fs = new FileStream(fileFullPath, fileMode))
+                using (FileStream fs = new FileStream(fileFullPath, opt.FileMode))
                 {
-                    fs.SetLength(size);
+                    fs.SetLength(opt.Size);
                     // Make sure that the changes take effect when the stream is
                     // flushed to disk.
                     fs.Seek(fs.Length, SeekOrigin.Begin);
@@ -39,7 +54,7 @@ namespace LibTruncate
             }
             catch (FileNotFoundException)
             {
-                if (!quiet)
+                if (!opt.Quiet)
                     Console.WriteLine($"File not found: {fileFullPath}");
             }
         }
