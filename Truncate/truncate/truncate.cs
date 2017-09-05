@@ -1,15 +1,10 @@
 ﻿using clipr;
 using clipr.Core;
-using libtruncate;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace truncate
+namespace Truncate
 {
     class truncate
     {
@@ -43,7 +38,7 @@ namespace truncate
 
                 FileMode fileMode = (opt.NoCreate) ? FileMode.Open : FileMode.OpenOrCreate;
 
-                Truncate.TruncateFiles(fileMode, opt.Quiet, opt.Size, opt.FileNames);
+                LibTruncate.Truncate.TruncateFiles(fileMode, opt.Quiet, opt.Size, opt.FileNames);
             }
             catch (ParseException ex)
             {

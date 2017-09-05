@@ -1,10 +1,10 @@
-﻿using libtruncate;
+﻿using LibTruncate;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System;
 
-namespace trucatetests
+namespace TruncateTests
 {
     [TestClass]
     public class TruncateTests
